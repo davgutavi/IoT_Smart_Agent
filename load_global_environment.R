@@ -9,6 +9,8 @@ require(lubridate)
 require(xtable)
 require(stringr)
 require(scales)
+require(gridExtra)
+#require(Cairo)
 
 # utilities----
 source("utilities/general_utils.R")

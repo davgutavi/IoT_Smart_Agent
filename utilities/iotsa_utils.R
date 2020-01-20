@@ -1,19 +1,50 @@
-# New----
 
-# completeExperimentDf<-function(experimentDfList){
-#   
-#   wi<-1
-#   ti<-1
-#   pred<-experimentDfList[[wi]][[ti]]
-#   ldf<-data.frame(w=rep(window.values[wi],nrow(pred)),test=rep(window.values[ti],nrow(pred)),t=c(pred$nlp+1:nrow(pred)),o=pred$o,p=pred$p)
-#   for (wi in (2:window.count)){
-#     pred<-lp[[wi]][[testIndex]]
-#     ldf<-bind_rows(ldf,data.frame(w=rep(window.values[wi],nrow(pred)),t=c(pred$nlp+1:nrow(pred)),o=pred$o,p=pred$p))
-#   }
-#   ldf<-cbind(experiment=rep("light",nrow(ldf)),ldf)
-#   
-#   
-# }
+windowResultsDf<- function(experiment="light",configuration="re1",windowValue=3){
+
+wi<-which(window.values == windowValue)
+
+if (experiment=="light"){
+  if (configuration=="re1"){
+    wf<-light.results.dfs.re1config[[wi]]
+  }
+  else if (configuration=="mre"){
+    wf<-light.results.dfs.mreconfig[[wi]]
+  }
+}
+
+if (experiment=="pressure"){
+  if (configuration=="re1"){
+    wf<-pressure.results.dfs.re1config[[wi]]
+  }
+  else if (configuration=="mre"){
+    wf<-pressure.results.dfs.mreconfig[[wi]]
+  }
+}
+
+if (experiment=="temperature"){
+  if (configuration=="re1"){
+    wf<-temperature.results.dfs.re1config[[wi]]
+  }
+  else if (configuration=="mre"){
+    wf<-temperature.results.dfs.mreconfig[[wi]]
+  }
+}
+
+
+mi <- 1
+pred<-wf[[mi]]
+
+df<-data.frame(m=rep(mi,nrow(pred)),t=c(pred$nlp+1:nrow(pred)),o=pred$o,p=pred$p)
+
+
+for (mi in (2:length(wf))){
+  pred<-wf[[mi]]
+  df<-bind_rows(df,data.frame(m=rep(mi,nrow(pred)),t=c(pred$nlp+1:nrow(pred)),o=pred$o,p=pred$p))
+}
+
+return(df)
+}
+
 
 
 experimentWindowTestDf<- function(experiment="light",configuration="re1",windowValue=3,modelIndex=30){

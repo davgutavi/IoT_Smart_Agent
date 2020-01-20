@@ -260,7 +260,6 @@ getExperimentWindowNlplMre<-function(baseType){
   
   return(df)
   
-  
 }
 
 
@@ -338,4 +337,57 @@ graphMreIncrementalGrid<-function(experimentWindowNlplMreDf,ylimits=NULL){
   
   return(gr)
 }
+
+
+# IJCIS ----
+getExpDf<-function(var, baseType){
+  
+  if (baseType=="re1" && var =="p"){
+    res<-pressure.results.object.re1config
+  }
+  else if (baseType=="mre" && var =="p"){
+    res<-pressure.results.object.mreconfig
+  }
+  else if (baseType=="re1" && var =="t"){
+    res<-temperature.results.object.re1config
+  }
+  else if (baseType=="mre" && var =="t"){
+    res<-temperature.results.object.mreconfig
+  }
+  
+  df<-getWindowNlplMre(res)
+  
+  return(df)
+  
+}
+
+grInclGrid<-function(experimentWindowNlplMreDf,ylimits=NULL,nr=2,nc=5){
+  
+  frame<-experimentWindowNlplMreDf
+  
+  wlabs <- c("w = 3","w = 4","w = 6","w = 12","w = 24","w = 90","w = 180","w = 360","w = 720","w = 1080") 
+  names(wlabs) <- c(3,4,6,12,24,90,180,360,720,1080)
+ 
+  fs <- 7
+  
+   gr<-ggplot(frame, aes(x = nlp,y = mre*100)) +
+    geom_line() +
+    facet_wrap(. ~ w,labeller = labeller(w=wlabs), scales="free",nrow = nr,ncol = nc)+
+    scale_y_continuous(oob=squish,limits=ylimits,na.value=ylimits[2])+
+    labs(y = "MAPE", x="Number of instances") +
+    # theme_minimal() + 
+     theme(panel.border = element_rect(color="black", fill=NA), 
+          strip.background = element_rect(fill=NA),
+          strip.text       = element_text(size = fs, face = "bold", family = "mono"),
+          axis.title       = element_text(size = fs, face = "bold", family = "mono"),
+          axis.text        = element_text(size = fs, family = "mono"),
+          axis.text.x      = element_text(angle = 90, hjust = 0.5)
+    ) 
+  
+  return(gr)
+}
+
+
+
+
 

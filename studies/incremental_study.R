@@ -1,4 +1,34 @@
 source("load_utilities.R")
+
+
+#TFM###############################################
+df<-getExperimentWindowNlplMre("re1")
+
+dfl<- df[df$experiment=="light",-1]
+dfp<- df[df$experiment=="pressure",-1]
+dft<- df[df$experiment=="temperature",-1]
+
+frame<-dft
+nr<-5
+nc<-5
+gr<-ggplot(frame, aes(x = nlp,y = mre*100)) +
+  geom_line() +
+  facet_wrap(~w,labeller = label_both,scales="free",nrow = nr,ncol = nc)+
+  labs(y = "mean relative error (%)", x="#lp") +
+  theme_minimal() + 
+  theme(panel.border = element_rect(color="black", fill=NA), 
+        strip.background = element_rect(fill=NA, color="black"),
+        axis.title = element_text(size = 10, face = "bold"),
+        axis.text = element_text(size = 8),
+        strip.text = element_text(size = 10),
+        axis.text.x = element_text(angle = 90, hjust = 0.5)
+  ) 
+print(gr)
+
+ggsave("incremental_light.eps",plot=gr,path="/Users/davgutavi/Desktop",device = "eps")
+ggsave("incremental_pressure.eps",plot=gr,path="/Users/davgutavi/Desktop",device = "eps")
+ggsave("incremental_temperature.eps",plot=gr,path="/Users/davgutavi/Desktop",device = "eps")
+
 #RE1###############################################
 # Light -> configuration: re1, output: re---- 
 l.cre1.re<- getErrorGraphByExpAndPpi(light.results.object.re1config,ylimits = c(0,500))
@@ -78,3 +108,51 @@ cmre.df.mre<-getExperimentWindowNlplMre("mre")
 cmre.gr.mre<-graphMreIncrementalGrid(cmre.df.mre)
 print(cmre.gr.mre)
 ggsave("grid_cmre_mre.eps",plot=cmre.gr.mre,path=paths.studies.mreconfig.incremental,device = "eps")
+
+
+
+
+# IJCIS ----
+
+source("load_utilities.R")
+# folder <- "/Users/davgutavi/NAS_DAVGUTAVI/INVESTIGACION/iot_smart_agent/ijcis_special_issue/ijcis_paper/img"
+# folder <- "/Users/davgutavi/NAS_DAVGUTAVI/INVESTIGACION/iot_smart_agent/ieee_internet_of_things_journal/ieee-iotj/img"
+folder <- "/Users/davgutavi/Desktop/"
+
+units  <- "cm"
+# length <- 15
+# width  <- 8
+
+tmdf  <- getExpDf("t","mre")
+tmgr <- grInclGrid(tmdf, c(7,10))
+print(tmgr)
+
+prdf  <- getExpDf("p","mre")
+prgr <- grInclGrid(prdf, c(0.4,1))
+print(prgr)
+
+length <- 15
+width  <- 20
+
+ggsave("temperature_incremental.eps",plot=tmgr,path=folder,device =cairo_ps,width = width, height = length, units = units)
+ggsave("pressure_incremental.eps",plot=prgr,path=folder,device =cairo_ps,width = width, height = length, units = units)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

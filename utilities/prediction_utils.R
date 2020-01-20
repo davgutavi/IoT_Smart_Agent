@@ -1,11 +1,48 @@
-tsGraph<-function(experiment="light",configuration="re1",windowValue=3,modelIndex=30){
+
+
+
+tsGraph<-function(experiment="light",configuration="re1",windowValue=3,modelIndex=30, title= "", pcl="black",ylimits=NULL){
   df<-experimentWindowTestDf(experiment,configuration,windowValue,modelIndex)
   ndf<-melt(df,"t")
+  
+  fs <- 5
+  ft <- 5
+  yl<- "value"
+  xl<- "time instant"
+
+  
+  if (experiment=="temperature"){
+    yl <- expression(degree*C)
+  }
+  else if (experiment=="pressure"){
+    yl <- "kPa"
+  }
+  
   gr<-ggplot(ndf, aes(x = t,y = value,group = variable)) +
-    geom_line(aes(linetype=variable)) +
-    labs(y = "value", x="time instant")
+    geom_line(aes(linetype=variable,color = variable)) +
+    ggtitle(title) +
+    scale_color_manual(values= c("grey",pcl)) +
+    scale_y_continuous(limits=ylimits,na.value=ylimits[2])+
+    labs(y = yl, x=xl) +
+    # ylim(ylimits)+
+    theme_minimal() + 
+    theme(legend.position = "none",
+          panel.border = element_rect(color="black", fill=NA), 
+          strip.background = element_rect(fill=NA, color="black"),
+          plot.title = element_text(size = ft, face="bold",family = "mono"),
+          axis.title = element_text(size = fs, family = "mono"),
+          axis.text = element_text(size = fs, family = "mono"),
+          strip.text = element_text(size = fs, family = "mono"),
+          axis.text.x = element_text(angle = 90, hjust = 0.5)
+    )
+
+  
   return(gr)
 }
+
+
+
+
 
 optimalGrid <- function(modelIndexesVector,experiment,configuration){
   
@@ -23,14 +60,15 @@ optimalGrid <- function(modelIndexesVector,experiment,configuration){
   gr<-ggplot(ndf, aes(x = t,y = value,group = variable)) +
     geom_line(aes(linetype=variable)) +
     labs(y = "value", x="time instant") +
-    facet_wrap(window~model,labeller = label_both,scales="free",nrow = 5,ncol = 2)+
+    # facet_wrap(window~model,labeller = label_both,scales="free",nrow = 10,ncol = 1)+
+    facet_wrap(window~model,labeller = label_both,scales="free",nrow = 5,ncol = 5)+
     scale_y_continuous(oob=squish)+
     theme_minimal() + 
     theme(panel.border = element_rect(color="black", fill=NA), 
           strip.background = element_rect(fill=NA, color="black"),
-          axis.title = element_text(size = 5, face = "bold"),
-          axis.text = element_text(size = 5),
-          strip.text = element_text(size = 5),
+          axis.title = element_text(size = 8, face = "bold"),
+          axis.text = element_text(size = 8),
+          strip.text = element_text(size = 8),
           axis.text.x = element_text(angle = 90, hjust = 0.5)
     )
   
@@ -38,7 +76,37 @@ optimalGrid <- function(modelIndexesVector,experiment,configuration){
   
 }
 
-
+windowGrid <- function(modelIndexesVector,experiment,configuration){
+  
+  i<-1
+  df <- data.frame(window=window.values[i],model=modelIndexesVector[i],
+                   experimentWindowTestDf(experiment,configuration,window.values[i],modelIndexesVector[i]))
+  
+  for (i in c(2:length(modelIndexesVector))){
+    df<-bind_rows(df,
+                  data.frame(window=window.values[i],model=modelIndexesVector[i],
+                             experimentWindowTestDf(experiment,configuration,window.values[i],modelIndexesVector[i])))
+  }
+  
+  ndf<-melt(df,c("window","model","t"))
+  gr<-ggplot(ndf, aes(x = t,y = value,group = variable)) +
+    geom_line(aes(linetype=variable)) +
+    labs(y = "value", x="time instant") +
+    # facet_wrap(window~model,labeller = label_both,scales="free",nrow = 10,ncol = 1)+
+    facet_wrap(window~model,labeller = label_both,scales="free",nrow = 5,ncol = 5)+
+    scale_y_continuous(oob=squish)+
+    theme_minimal() + 
+    theme(panel.border = element_rect(color="black", fill=NA), 
+          strip.background = element_rect(fill=NA, color="black"),
+          axis.title = element_text(size = 8, face = "bold"),
+          axis.text = element_text(size = 8),
+          strip.text = element_text(size = 8),
+          axis.text.x = element_text(angle = 90, hjust = 0.5)
+    )
+  
+  return (gr)
+  
+}
 
 generalGrid<-function (config="re1",testIndex=30){
   
@@ -189,8 +257,8 @@ experimentGrid<-function(df){
 }
 
 windowPlot<-function(df,wv){
-  e<-df[,-1]
-  e<-e[e$w==wv,]
+  
+  e<-df[df$w==wv,]
   e<-e[,-1]
   ndf<-melt(e,"t")
   gr<-ggplot(ndf, aes(x = t,y = value,group = variable)) +
@@ -299,3 +367,27 @@ gr<-ggplot(ndf, aes(x = t,y = value,group = variable, color = variable)) +
 return(gr)
 
 }
+
+
+
+
+windowPredictionsGrid<-function(experiment="light",configuration="re1",windowValue=3, from=0, to=5){
+  wdf <- windowResultsDf(experiment,configuration,windowValue)
+  df<- subset(wdf, m>from & m<=to)
+  ndf<-melt(df,c("m","t"))
+  gr<-ggplot(ndf, aes(x = t,y = value,group = variable)) +
+    geom_line(aes(linetype=variable)) +
+    labs(y = "value", x="time instant") +
+    facet_wrap(.~m,labeller = label_both,scales="free",ncol = 1)+
+    scale_y_continuous(oob=squish)+
+    theme_minimal() + 
+    theme(panel.border = element_rect(color="black", fill=NA), 
+          strip.background = element_rect(fill=NA, color="black"),
+          axis.title = element_text(size = 8, face = "bold"),
+          axis.text = element_text(size = 8),
+          strip.text = element_text(size = 8),
+          axis.text.x = element_text(angle = 90, hjust = 0.5)
+    )
+  return (gr)
+}
+

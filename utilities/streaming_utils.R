@@ -42,7 +42,7 @@ injecTrainingTestFiles <-
         
         aux <- strsplit(pathTs, "/")[[1]]
         aux1 <- strsplit(aux[length(aux)], ".", fixed = TRUE)
-        nameTs <- paste0(aux1[[1]][1], "_", str_pad(batch, 4, pad = "0"), ".", aux1[[1]][2])
+        nameTs <- paste0(aux1[[1]][1], "_", stringr::str_pad(batch, 4, pad = "0"), ".", aux1[[1]][2])
         connPts <- file(pathTs)
         testData <- readLines(connPts, warn = F)
         testFile <- paste0(testPath, "/", nameTs)
@@ -66,10 +66,10 @@ injecTrainingTestFiles <-
       
     }
     
-    close(connPts)
-    close(connTs)
-    close(connPtr)
-    close(connTr)
+    # close(connPts)
+    # close(connTs)
+    # close(connPtr)
+    # close(connTr)
     
     
   }

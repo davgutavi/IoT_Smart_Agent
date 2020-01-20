@@ -4,7 +4,9 @@ os <- "MACOSX"
 if (os == "MACOSX"){
   
   ##Carga SparkR en Mac OSX
-  Sys.setenv(SPARK_HOME = "/Users/davgutavi/Spark/spark-2.2.1-bin-hadoop2.7")
+  #Sys.setenv(SPARK_HOME = "/Users/davgutavi/Spark/spark-2.2.1-bin-hadoop2.7")
+  Sys.setenv(SPARK_HOME = "/Users/davgutavi/Spark/spark-2.4.3-bin-hadoop2.7")
+  
   Sys.setenv(JAVA_HOME = "/Library/Java/JavaVirtualMachines/jdk1.8.0_152.jdk/Contents/Home")
   library(SparkR, lib.loc = c(file.path(Sys.getenv("SPARK_HOME"), "R", "lib")))
   sparkR.session(master = "local[*]", sparkConfig = list(spark.driver.memory = "2g"))
